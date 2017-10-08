@@ -29,4 +29,4 @@ You can check at http://localhost:3000
 
 
 ## License
-udacity-a-book-tracking-app  is a public domain work. Feel free to do whatever you want with it.
+MIT. You can do whatever you want.
