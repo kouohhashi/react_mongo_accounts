@@ -6,17 +6,27 @@ I ported Meteor's account package because I could not find good examples to deve
 
 ## Install
 ```
-git clone https://github.com/kouohhashi/udacity-react-readable-app.git
-cd udacity-react-readable-app
+git https://github.com/kouohhashi/react_mongo_accounts.git
+cd react_mongo_accounts
 npm install
 ```
 
 ## Usage
+
+### Start API server  
+API server is going to start on port 4002
+```
+npm run server
+```
+
+### Start React
+React is going to start on port 3000
 ```
 npm run start
 ```
 
-You also need to install [reactnd-project-readable-starter](https://github.com/udacity/reactnd-project-readable-starter) for backend.
+You can check at http://localhost:3000
+
 
 ## License
 udacity-a-book-tracking-app  is a public domain work. Feel free to do whatever you want with it.
