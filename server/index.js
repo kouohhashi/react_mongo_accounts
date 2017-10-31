@@ -1,11 +1,21 @@
 const port = 4002
 
 import express from 'express'
+
+import session from 'express-session'
+
 const app = express()
 
 import bodyParser from 'body-parser'
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use( bodyParser.json() );
+
+app.use(session({
+  secret: 'dog vs cat',
+  resave: true,
+  saveUninitialized: false,
+}))
+
 
 const api = require('./routes/api');
 

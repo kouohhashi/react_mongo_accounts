@@ -3,7 +3,7 @@ import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 
 // semantic-ui
-import { Container, Form, Input, Button, Grid, Icon } from 'semantic-ui-react'
+import { Container, Form, Input, Button, Grid } from 'semantic-ui-react'
 
 // API
 import * as MyAPI from '../utils/MyAPI'
@@ -22,7 +22,6 @@ class CreateAccontForm extends Component {
   onSubmit = () => {
 
     const { email, password } = this.state
-    console.log("onSubmit called: ", password, email )
 
     const params = {
       email: email,
@@ -33,8 +32,6 @@ class CreateAccontForm extends Component {
     MyAPI.createAccount(params)
     .then((data) => {
       // save account
-
-      console.log(data)
 
       // success
       const params = {
@@ -52,7 +49,6 @@ class CreateAccontForm extends Component {
       this.props.history.push("/dashboard")
     })
     .catch((err) => {
-      console.log("create account -- 3 --")
       console.log("err:", err)
 
       Alert.error(err, {

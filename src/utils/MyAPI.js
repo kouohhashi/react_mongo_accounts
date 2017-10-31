@@ -1,6 +1,7 @@
-api = "http://localhost:4002"
+// you can change the port number at server/index.js
+const api = "http://localhost:4002"
 
-const API_KEY = 'api_key'
+const API_KEY = '__api_key__'
 
 const headers = {
   'Accept': 'application/json',

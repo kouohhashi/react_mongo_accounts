@@ -7,7 +7,7 @@ function user (state = {}, action) {
   switch (action.type) {
 
     case LOGIN_WITH_EMAIL :
-      // console.log("AAAAAAA params:", action)
+    
       const { login_token, user } = action.params
 
       return {

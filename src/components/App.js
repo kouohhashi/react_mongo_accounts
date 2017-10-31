@@ -17,12 +17,10 @@ import * as MyAPI from '../utils/MyAPI'
 
 // redux
 import { connect } from 'react-redux'
-// import { apiGetCategories } from '../actions/CategoriesActions'
 
 import { withRouter } from 'react-router';
 
 import { LOCAL_STRAGE_KEY } from '../utils/Settings'
-import { signinWithToken } from '../utils/MyAPI'
 import { loginWithEmailRedux } from '../actions/UserActions'
 
 class App extends Component {
@@ -69,7 +67,6 @@ class App extends Component {
       })
     })
     .catch((err) => {
-      console.log("signinWithToken -- 3 --")
       console.log("err:", err)
       localStorage.removeItem(LOCAL_STRAGE_KEY);
     })

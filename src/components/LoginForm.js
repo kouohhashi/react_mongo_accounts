@@ -3,7 +3,7 @@ import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 
 // semantic-ui
-import { Container, Form, Input, Button, Grid, Icon } from 'semantic-ui-react'
+import { Container, Form, Input, Button, Grid } from 'semantic-ui-react'
 
 // alert
 import Alert from 'react-s-alert';
@@ -24,10 +24,6 @@ class LoginForm extends Component {
   onSubmit = () => {
 
     const { email, password } = this.state
-    // console.log("onSubmit called: ", password, email )
-
-    console.log("signin -- 1 --")
-
     const params = {
       email: email,
       password: password,
@@ -38,9 +34,6 @@ class LoginForm extends Component {
     .then((data) => {
 
       return new Promise((resolve, reject) => {
-
-        console.log("signin -- 2 --")
-        console.log(data)
 
         if (data.status !== 'success'){
           let error_text = 'Error';
@@ -67,7 +60,6 @@ class LoginForm extends Component {
       this.props.history.push("/dashboard")
     })
     .catch((err) => {
-      console.log("signin -- 3 --")
       console.log("err:", err)
 
       Alert.error(err, {

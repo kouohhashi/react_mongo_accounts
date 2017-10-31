@@ -1,10 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-
-// alert
-import Alert from 'react-s-alert';
 
 import { LOCAL_STRAGE_KEY } from '../utils/Settings'
 
@@ -23,12 +19,11 @@ class Dashboard extends Component {
 
     MyAPI.logout(param)
     .then((results) => {
-      console.log(results)
       localStorage.removeItem(LOCAL_STRAGE_KEY);
       this.props.history.push("/")
     })
     .catch((err) => {
-      console.log(err)
+      console.log("err: ", err)
       localStorage.removeItem(LOCAL_STRAGE_KEY);
       this.props.history.push("/")
     })
@@ -37,25 +32,23 @@ class Dashboard extends Component {
   render() {
 
     const { user } = this.props
-    const { recording, recordedBlob } = this.state
-    console.log("user:", user)
 
     return(
-      <Container className='dashboard' style={{textAlign: 'center'}}>
+      <div className='dashboard' style={{textAlign: 'center'}}>
 
-        <Grid style={{marginTop:60}}>
-          <Grid.Column textAlign='right' width={16}>
+        <div style={{marginTop:60}}>
+          <div>
             <span style={{cursor: 'pointer'}} onClick={() => this.logoutRequest()}>logout</span>
-          </Grid.Column>
-        </Grid>
+          </div>
+        </div>
 
-        <Grid>
-          <Grid.Column textAlign='center' width={16}>
-            Dashborad
-          </Grid.Column>
-        </Grid>
+        <div>
+          <div>
+            { JSON.stringify(user)}
+          </div>
+        </div>
 
-      </Container>
+      </div>
     )
   }
 }

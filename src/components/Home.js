@@ -4,32 +4,13 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 // semantic-ui
-import { Container, Form, Input, Button, Grid } from 'semantic-ui-react'
+import { Container, Grid } from 'semantic-ui-react'
 
 import LoginForm from './LoginForm'
 
 class Home extends Component {
 
-  state = {
-    userId: '',
-    password: '',
-  }
-
-  onSubmit = () => {
-    console.log("onSubmit called")
-
-    const { userId, password } = this.state
-
-    // login
-  }
-
-  handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value })
-  }
-
   render() {
-
-    const { userId, password } = this.state
 
     return(
       <Container className='home' style={{textAlign: 'center'}}>

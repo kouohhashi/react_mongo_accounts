@@ -3,12 +3,15 @@ import sha256 from 'sha256'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
+// change this
+const db_name = 'example_db'
+
 // Connection URL
 import MongoDbHelper from './MongoDbHelper';
-let url = 'mongodb://localhost:27017/<database naem>';
+let url = 'mongodb://localhost:27017/'+db_name;
 let mongoDbHelper = new MongoDbHelper(url);
 
-const API_KEY = 'apy_key'
+const API_KEY = '__api_key__'
 
 // start connection
 mongoDbHelper.start(() => {
@@ -32,11 +35,10 @@ function makeid (count) {
 // index
 exports.echo = (req, res) => {
 
-  const { userId, login_token } = req.session
+  const { login_token } = req.session
 
   res.json({
     status: 'OK',
-    userId: userId,
     login_token: login_token
   });
 }
@@ -108,14 +110,12 @@ exports.create_user = (req, res) => {
         }
       ],
       profile : {},
-      reader_id: reader_id,
     }
 
     // insert
     return mongoDbHelper.collection("users").insert(insert_params)
   })
   .then((results) => {
-    console.log(results)
 
     if ( results === null ) {
       res.json({ status: 'error', detail: 'no such user' });
@@ -125,7 +125,7 @@ exports.create_user = (req, res) => {
     user_info._id = results._id;
     user_info.profile = results.profile;
 
-    req.session.userId = user_info._id
+    // req.session.userId = user_info._id
     req.session.login_token = login_token // maybe not necessary
 
     res.json({
@@ -136,7 +136,6 @@ exports.create_user = (req, res) => {
 
   })
   .catch((err) => {
-    console.log(err)
     res.json({ status: 'error', detail: err });
   })
 }
@@ -149,7 +148,7 @@ exports.login_with_email_password = (req, res) => {
   let api_key =  req.headers.authorization
 
   if (api_key !== API_KEY){
-    res.json({ status: 'error', detail: 'api key is invalid' });
+    res.json({ status: 'error', detail: 'api key is invalid 2' });
     return;
   }
 
@@ -179,13 +178,8 @@ exports.login_with_email_password = (req, res) => {
       user_info.profile = results.profile;
 
       let password2 = sha256(password)
-      console.log("password2 :", password2)
-      // let bcrypt_hash = bcrypt.hashSync(password2, 10);
 
       const saved_hash = results.services.password.bcrypt
-
-      console.log("saved_hash :", saved_hash)
-      // console.log("bcrypt_hash:", bcrypt_hash)
 
       bcrypt.compare(password2, saved_hash, (err, res) => {
         if (err){
@@ -227,6 +221,9 @@ exports.login_with_email_password = (req, res) => {
   })
   .then((results) => {
 
+    // set session
+    req.session.login_token
+
     res.json({
       status: 'success',
       user: user_info,
@@ -242,8 +239,16 @@ exports.login_with_email_password = (req, res) => {
 // logout
 exports.logout = (req, res) => {
 
-  let login_token = req.body.login_token;
+  // let login_token = req.body.login_token;
+  let login_token = req.session.login_token;
+  if (!login_token){
+    // user is not login
+    res.json({status: 'success'})
+    return;
+  }
+
   let api_key =  req.headers.authorization
+
 
   if (api_key !== API_KEY){
     res.json({ status: 'error', detail: 'api key is invalid' });
@@ -280,22 +285,21 @@ exports.logout = (req, res) => {
     return mongoDbHelper.collection("users").update(find_param, upd_param)
   })
   .then(() => {
+    return new Promise((resolve, reject) => {
+
+    })
+    req.session.destroy((err) => {
+      if (err) {
+        reject(err)
+      }
+      resolve()
+    })
+  })
+  .then(() => {
     res.json({status: 'success'})
   })
   .catch((err) => {
      res.json({status: 'error', detail: err})
-  })
-}
-
-// helper function to create directory
-function checkDirectory(dir) {
-  return new Promise((resolve, reject) => {
-    mkdirp(dir, function (err) {
-      if (err){
-        reject(err)
-      }
-      resolve()
-    });
   })
 }
 
@@ -334,6 +338,9 @@ exports.login_with_token = (req, res) => {
     user_info._id = results._id;
     user_info.profile = results.profile;
 
+    // set session
+    req.session.login_token
+
     // return success
     res.json({
       status: 'success',
@@ -343,6 +350,6 @@ exports.login_with_token = (req, res) => {
   })
   .catch((err) => {
     res.json({status: 'error', detail: err})
-    console.log(err)
+    console.log("err:", err)
   })
 }
