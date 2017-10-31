@@ -29,11 +29,10 @@ npm run start_react
 
 You can check at http://localhost:3000  
 
-# Requirement  
+## Requirement  
 
-# You need MongoDB. Here's an example of installing MongoDB
+### You need MongoDB. Here's an example of installing MongoDB on mac os X  
 
-## on mac os x  
 ```
 brew update   
 brew install mongodb  
