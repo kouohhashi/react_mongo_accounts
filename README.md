@@ -17,6 +17,7 @@ npm install
 
 ### Start API server  
 API server is going to start on port 4002
+You can change parameters around mongodb at ./server/routes/settings.js
 ```
 npm run start_server
 ```

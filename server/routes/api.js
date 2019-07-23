@@ -3,18 +3,15 @@ import sha256 from 'sha256'
 import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
-// change this
-const db_name = 'example_db'
-
-// Connection URL
+// mongodb setting
+import { MONGO_URL, USERS_COL, MONGO_DB_NAME } from './settings.js'
 import MongoDbHelper from './MongoDbHelper';
-let url = 'mongodb://localhost:27017/'+db_name;
-let mongoDbHelper = new MongoDbHelper(url);
+let mongoDbHelper = new MongoDbHelper(MONGO_URL);
 
 const API_KEY = '__api_key__'
 
 // start connection
-mongoDbHelper.start(() => {
+mongoDbHelper.start(MONGO_DB_NAME, () => {
   console.log("mongodb ready")
 });
 
@@ -61,7 +58,7 @@ exports.create_user = (req, res) => {
   let find_param = {
     'emails.address':email
   }
-  mongoDbHelper.collection("users").count(find_param)
+  mongoDbHelper.collection(USERS_COL).count(find_param)
   .then((results) => {
     return new Promise((resolve, reject) => {
       if (results != 0){
@@ -113,7 +110,7 @@ exports.create_user = (req, res) => {
     }
 
     // insert
-    return mongoDbHelper.collection("users").insert(insert_params)
+    return mongoDbHelper.collection(USERS_COL).insert(insert_params)
   })
   .then((results) => {
 
@@ -160,7 +157,7 @@ exports.login_with_email_password = (req, res) => {
   let login_token
 
   // insert
-  mongoDbHelper.collection("users").findOne(find_param)
+  mongoDbHelper.collection(USERS_COL).findOne(find_param)
   .then((results) => {
     // check password
 
@@ -217,7 +214,7 @@ exports.login_with_email_password = (req, res) => {
     };
 
     // update
-    return mongoDbHelper.collection("users").update(find_param, upd_param)
+    return mongoDbHelper.collection(USERS_COL).update(find_param, upd_param)
   })
   .then((results) => {
 
@@ -265,7 +262,7 @@ exports.logout = (req, res) => {
   }
 
   // find user
-  mongoDbHelper.collection("users").findOne(find_param)
+  mongoDbHelper.collection(USERS_COL).findOne(find_param)
   .then((results) => {
 
     if (results === null){
@@ -282,7 +279,7 @@ exports.logout = (req, res) => {
         }
       }
     };
-    return mongoDbHelper.collection("users").update(find_param, upd_param)
+    return mongoDbHelper.collection(USERS_COL).update(find_param, upd_param)
   })
   .then(() => {
     return new Promise((resolve, reject) => {
@@ -326,7 +323,7 @@ exports.login_with_token = (req, res) => {
   }
 
   // find user
-  mongoDbHelper.collection("users").findOne(find_param)
+  mongoDbHelper.collection(USERS_COL).findOne(find_param)
   .then((results) => {
     // set user info
 

@@ -3,27 +3,27 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "bcrypt": "^1.0.3",
-    "body-parser": "^1.18.2",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
     "crypto": "^1.0.1",
-    "express": "^4.16.1",
-    "express-session": "^1.15.6",
-    "mongodb": "^2.2.31",
-    "radium": "^0.19.5",
-    "react": "^16.0.0",
-    "react-animations": "^0.1.0",
-    "react-bootstrap": "^0.31.3",
-    "react-dom": "^16.0.0",
-    "react-ionicons": "^1.5.9",
-    "react-redux": "^5.0.6",
-    "react-router-dom": "^4.2.2",
-    "react-s-alert": "^1.3.1",
-    "react-scripts": "1.0.14",
-    "redux": "^3.7.2",
-    "semantic-ui-css": "^2.2.12",
-    "semantic-ui-react": "^0.74.2",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "mongodb": "^3.3.0-beta2",
+    "radium": "^0.25.2",
+    "react": "^16.8.6",
+    "react-animations": "^1.0.0",
+    "react-bootstrap": "^1.0.0-beta.9",
+    "react-dom": "^16.8.6",
+    "react-ionicons": "^3.0.1",
+    "react-redux": "^7.1.0",
+    "react-router-dom": "^5.0.1",
+    "react-s-alert": "^1.4.1",
+    "react-scripts": "^3.0.1",
+    "redux": "^4.0.4",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.87.3",
     "sha256": "^0.2.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.3.2"
   },
   "description": "This is an example of signin and signuot on reactjs and mongodb",
   "scripts": {
@@ -38,5 +38,17 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
