@@ -4,15 +4,24 @@ import crypto from 'crypto'
 import bcrypt from 'bcrypt'
 
 // mongodb setting
-import { MONGO_URL, USERS_COL, MONGO_DB_NAME } from './settings.js'
+import { MONGO_URL, USERS_COL, MONGO_DB_NAME, API_KEY } from './settings.js'
 import MongoDbHelper from './MongoDbHelper';
-let mongoDbHelper = new MongoDbHelper(MONGO_URL);
 
-const API_KEY = '__api_key__'
+// auth apis
+import {
+  create_user,
+  login_with_email_password,
+  logout,
+  login_with_token,
+  check_login_token,
+  check_login_token_and_return_uid,
+  update_password,
+} from './auth_api'
 
-// start connection
-mongoDbHelper.start(MONGO_DB_NAME, () => {
-  console.log("mongodb ready")
+// mongodb
+const mongoDbHelper = new MongoDbHelper(MONGO_URL, MONGO_DB_NAME);
+mongoDbHelper.start(() => {
+  console.log("mongoDbHelper ready")
 });
 
 // generate random string
@@ -40,313 +49,143 @@ exports.echo = (req, res) => {
   });
 }
 
-// create user
-exports.create_user = (req, res) => {
+// create_user
+exports.create_user = async (req, res) => {
+  console.log("create_user started")
 
-  let password =  req.body.password;
-  let email =  req.body.email;
-  let api_key =  req.headers.authorization
+  try {
+    let _rtnObj = await create_user(req, res, mongoDbHelper)
+    console.log("_rtnObj: ", _rtnObj)
+    res.json({
+      status: 'success',
+      login_token: _rtnObj.login_token,
+      user_info: _rtnObj.user_info,
+    });
+  } catch(err) {
+    console.log("err: ", err)
 
-  if (api_key !== API_KEY){
-    res.json({ status: 'error', detail: 'api key is invalid' });
-    return;
+    res.json({
+      status: 'error',
+      message: err.message
+    });
   }
+}
 
-  let user_info = {}
-  let login_token
+// login_with_email_password
+exports.login_with_email_password = async (req, res) => {
+  console.log("login_with_email_password started")
 
-  let find_param = {
-    'emails.address':email
-  }
-  mongoDbHelper.collection(USERS_COL).count(find_param)
-  .then((results) => {
-    return new Promise((resolve, reject) => {
-      if (results != 0){
-        reject("user already exist")
-      }
-      resolve()
-    })
-  })
-  .then(() => {
-    // bcrypt of password
-    let password2 = sha256(password)
-    var bcrypt_hash = bcrypt.hashSync(password2, 10);
+  try {
 
-    // login token which to use login
-    login_token = makeid('4') + parseInt(new Date().getTime()).toString(36);
-    const hashed_token = crypto.createHash('sha256').update(login_token).digest('base64');
+    let {login_token, user_info} = await login_with_email_password(req, res, mongoDbHelper)
 
-    const token_object = {
-      'when':new Date(),
-      'hashedToken':hashed_token,
-    };
-
-    let insert_params = {
-      createdAt: new Date(),
-      services:{
-        password : {
-          bcrypt : bcrypt_hash
-        },
-        resume : {
-          loginTokens : [token_object]
-        },
-        email : {
-          verificationTokens : [
-            {
-              // nameHash : nameHash,
-              address : email,
-              when : new Date(),
-            }
-          ]
-        },
-      },
-      emails : [
-        {
-          "address" : email,
-          "verified" : false
-        }
-      ],
-      profile : {},
-    }
-
-    // insert
-    return mongoDbHelper.collection(USERS_COL).insert(insert_params)
-  })
-  .then((results) => {
-
-    if ( results === null ) {
-      res.json({ status: 'error', detail: 'no such user' });
-      return;
-    }
-
-    user_info._id = results._id;
-    user_info.profile = results.profile;
-
-    // req.session.userId = user_info._id
-    req.session.login_token = login_token // maybe not necessary
+    console.log("login_with_email_password.login_token: ", login_token)
+    console.log("login_with_email_password.user_info: ", user_info)
 
     res.json({
       status: 'success',
-      user: user_info,
       login_token: login_token,
-    })
+      user_info: user_info,
+    });
 
-  })
-  .catch((err) => {
-    res.json({ status: 'error', detail: err });
-  })
-}
-
-// login with email and password
-exports.login_with_email_password = (req, res) => {
-
-  let password =  req.body.password;
-  let email =  req.body.email;
-  let api_key =  req.headers.authorization
-
-  if (api_key !== API_KEY){
-    res.json({ status: 'error', detail: 'api key is invalid 2' });
-    return;
-  }
-
-  let find_param = {
-    'emails.address':email
-  }
-
-  let user_info = {};
-  let login_token
-
-  // insert
-  mongoDbHelper.collection(USERS_COL).findOne(find_param)
-  .then((results) => {
-    // check password
-
-    return new Promise( (resolve, reject) => {
-
-      if (!results){
-        reject("no such user")
-      }
-      if (!results.services || !results.services.password || !results.services.password.bcrypt){
-        reject("something must be wrong")
-      }
-
-      // set user info
-      user_info._id = results._id;
-      user_info.profile = results.profile;
-
-      let password2 = sha256(password)
-
-      const saved_hash = results.services.password.bcrypt
-
-      bcrypt.compare(password2, saved_hash, (err, res) => {
-        if (err){
-          reject(err)
-        }
-
-        if (res === true){
-          resolve()
-        } else {
-          reject("password is not valid")
-        }
-      });
-    } )
-  })
-  .then(() => {
-    // issue token
-
-    let find_param = {
-      _id: user_info._id
-    }
-
-    // login token
-    login_token = makeid('4') + parseInt(new Date().getTime()).toString(36);
-    const hashed_token = crypto.createHash('sha256').update(login_token).digest('base64');
-
-    const token_object = {
-      'when':new Date(),
-      'hashedToken':hashed_token,
-    };
-
-    let upd_param = {
-      '$push':{
-        'services.resume.loginTokens':token_object
-      }
-    };
-
-    // update
-    return mongoDbHelper.collection(USERS_COL).update(find_param, upd_param)
-  })
-  .then((results) => {
-
-    // set session
-    req.session.login_token
+  } catch(err) {
+    console.log("err: ", err)
 
     res.json({
-      status: 'success',
-      user: user_info,
-      login_token: login_token,
-    })
-
-  })
-  .catch((err) => {
-    res.json({status: 'error', detail: err})
-  })
-}
-
-// logout
-exports.logout = (req, res) => {
-
-  // let login_token = req.body.login_token;
-  let login_token = req.session.login_token;
-  if (!login_token){
-    // user is not login
-    res.json({status: 'success'})
-    return;
+      status: 'error',
+      message: err.message
+    });
   }
-
-  let api_key =  req.headers.authorization
-
-
-  if (api_key !== API_KEY){
-    res.json({ status: 'error', detail: 'api key is invalid' });
-    return;
-  }
-
-  const hashed_token = crypto.createHash('sha256').update(login_token).digest('base64');
-  let find_param = {
-    'services.resume.loginTokens':{
-      '$elemMatch':{
-        'hashedToken':hashed_token
-      }
-    }
-  }
-
-  // find user
-  mongoDbHelper.collection(USERS_COL).findOne(find_param)
-  .then((results) => {
-
-    if (results === null){
-      return Promise.reject("no such token")
-    }
-
-    let find_param = {
-      '_id':results._id
-    };
-    var upd_param = {
-      '$pull':{
-        'services.resume.loginTokens':{
-          'type':'ios'
-        }
-      }
-    };
-    return mongoDbHelper.collection(USERS_COL).update(find_param, upd_param)
-  })
-  .then(() => {
-    return new Promise((resolve, reject) => {
-
-    })
-    req.session.destroy((err) => {
-      if (err) {
-        reject(err)
-      }
-      resolve()
-    })
-  })
-  .then(() => {
-    res.json({status: 'success'})
-  })
-  .catch((err) => {
-     res.json({status: 'error', detail: err})
-  })
 }
 
 // login_with_token
-exports.login_with_token = (req, res) => {
+exports.login_with_token = async (req, res) => {
+  console.log("login_with_token started")
 
-  let login_token =  req.body.login_token;
-  let api_key =  req.headers.authorization
+  try {
+    let {login_token, user_info} = await login_with_token(req, res, mongoDbHelper)
+    res.json({
+      status: 'success',
+      login_token: login_token,
+      user_info: user_info,
+    });
+  } catch(err) {
+    console.log("err: ", err)
 
-  if (api_key !== API_KEY){
-    res.json({ status: 'error', detail: 'api key is invalid' });
-    return;
+    res.json({
+      status: 'error',
+      message: err.message
+    });
   }
+}
 
-  let user_info = {};
+// logout
+exports.logout = async (req, res) => {
+  console.log("logout started")
 
-  const hashed_token = crypto.createHash('sha256').update(login_token).digest('base64');
-  let find_param = {
-    'services.resume.loginTokens':{
-      '$elemMatch':{
-        'hashedToken':hashed_token
-      }
-    }
+  try {
+    let _login_token = await logout(req, res, mongoDbHelper)
+    res.json({
+      status: 'success',
+      login_token: _login_token,
+    });
+  } catch(err) {
+    console.log("err: ", err)
+
+    res.json({
+      status: 'error',
+      message: err.message
+    });
   }
+}
 
-  // find user
-  mongoDbHelper.collection(USERS_COL).findOne(find_param)
-  .then((results) => {
-    // set user info
+// update_password
+exports.update_password = async (req, res) => {
+  console.log("update_password started")
 
-    if ( results === null ) {
-      res.json({ status: 'error', detail: 'no such user' });
+  try {
+
+    console.log("login_token ", req.body.login_token)
+
+    let old_login_token =  req.body.login_token;
+    let old_password =  req.body.old_password;
+    let new_password =  req.body.new_password;
+
+    let api_key =  req.headers.authorization
+    if (api_key !== API_KEY){
+      throw Error("api key is invalid")
       return;
     }
 
-    user_info._id = results._id;
-    user_info.profile = results.profile;
+    if (!req.body.login_token) {
+      throw Error("login token not found")
+    }
+    if (!old_password) {
+      throw Error("current password not found")
+    }
+    if (!new_password) {
+      throw Error("new password not found")
+    }
 
-    // set session
-    req.session.login_token
+    let results = await update_password({
+      old_login_token: old_login_token,
+      old_password: old_password,
+      new_password: new_password,
+      mongoDbHelper: mongoDbHelper,
+    })
 
-    // return success
     res.json({
       status: 'success',
-      user: user_info,
-      login_token: login_token,
-    })
-  })
-  .catch((err) => {
-    res.json({status: 'error', detail: err})
-    console.log("err:", err)
-  })
+      login_token: results.login_token,
+      user_info: results.user_info,
+    });
+
+  } catch(err) {
+    console.log("err: ", err)
+
+    res.json({
+      status: 'error',
+      message: err.message
+    });
+  }
 }

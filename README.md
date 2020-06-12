@@ -35,8 +35,8 @@ You can check at http://localhost:3000
 ### You need MongoDB. Here's an example of installing MongoDB on mac os X  
 
 ```
-brew update   
-brew install mongodb  
+brew tap mongodb/brew
+brew install mongodb-community
 mkdir mongodb_data  
 mongod --dbpath mongodb_data/  
 ```

@@ -1,8 +1,8 @@
 /**
- * Created by k33g_org on 24/10/14.
+ * Created by kouohhashi on 6/12/2020.
  */
 import mongodb  from 'mongodb';
-import uuid from 'uuid';
+import { v1 as uuidv1 } from 'uuid';
 
 /*
  http://mongodb.github.io/node-mongodb-native/2.0/tutorials/crud_operations/
@@ -10,21 +10,25 @@ import uuid from 'uuid';
 
 export default class MongoDbHelper {
 
-  constructor (url) {
+  constructor (url, db_name) {
     this.url = url;
+    this.db_name = db_name
     this.mongoClient = mongodb.MongoClient;
     this.db = null;
   }
 
-  start ( mongo_db_name, callback) {
-    this.mongoClient.connect(this.url, { useNewUrlParser: true }, (err, client) => {
+  start (callback) {
+    this.mongoClient.connect(this.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }, (err, client) => {
 
       if (err){
         callback(err);
         return;
       }
-      
-      this.db = client.db(mongo_db_name);
+
+      this.db = client.db(this.db_name);
       callback(null, this.db)
     });
   }
@@ -36,7 +40,7 @@ export default class MongoDbHelper {
       insert : (model) => { //TODO: insert many
         return new Promise((resolve, reject) => {
           if (!model._id){
-            model._id = uuid.v1();
+            model._id = uuidv1()
           }
           mongoDbCollection.insertOne(model, (err, result) => {
             if (err) { reject(err); }
@@ -146,6 +150,63 @@ export default class MongoDbHelper {
             if (err) { reject(err); }
             resolve(doc);
           });
+        });
+      },
+
+      get_find_cusor : (find_param, sort_param, skip, limit) => {
+
+        return new Promise((resolve, reject) => {
+
+          if (sort_param && skip && limit) {
+
+            let cursor = mongoDbCollection.find(find_param).sort(sort_param).skip(skip).limit(limit)
+            resolve(cursor)
+
+          } else if (sort_param, limit) {
+
+            let cursor = mongoDbCollection.find(find_param).sort(sort_param).limit(limit)
+            resolve(cursor)
+
+          } else if (sort_param) {
+
+            let cursor = mongoDbCollection.find(find_param).sort(sort_param)
+            resolve(cursor)
+
+          } else {
+
+            if (skip && limit) {
+
+              let cursor = mongoDbCollection.find(find_param).sort(sort_param).limit(limit)
+              resolve(cursor)
+
+            } else if (limit) {
+
+              let cursor = mongoDbCollection.find(find_param).limit(limit)
+              resolve(cursor)
+            } else {
+
+              let cursor = mongoDbCollection.find(find_param)
+              resolve(cursor)
+
+            }
+          }
+        });
+      },
+
+      get_next_from_cusor: (cursor) => {
+
+        // console.log("cursor: ", cursor)
+
+        return new Promise((resolve, reject) => {
+
+          cursor.next((err, item) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(item)
+            }
+          })
+
         });
       },
 

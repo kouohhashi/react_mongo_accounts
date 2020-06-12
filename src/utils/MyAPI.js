@@ -30,14 +30,6 @@ export const signinWithPassword = (params) =>
     body: JSON.stringify( params )
   }).then(res => res.json())
 
-
-// upload
-export const upload = (data) =>
-  fetch(`${api}/files`, {
-    method: 'POST',
-    body: data
-  }).then(res => res.json())
-
 // signin with token
 export const signinWithToken = (params) =>
   fetch(`${api}/login_with_token`, {
