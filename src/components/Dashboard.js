@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from '../utils/Helpers'
 import { connect } from 'react-redux'
-
 import { LOCAL_STRAGE_KEY } from '../utils/Settings'
-
-// API
 import * as MyAPI from '../utils/MyAPI'
 
 class Dashboard extends Component {
@@ -20,12 +17,12 @@ class Dashboard extends Component {
     MyAPI.logout(param)
     .then((results) => {
       localStorage.removeItem(LOCAL_STRAGE_KEY);
-      this.props.history.push("/")
+      this.props.history("/")
     })
     .catch((err) => {
       console.log("err: ", err)
       localStorage.removeItem(LOCAL_STRAGE_KEY);
-      this.props.history.push("/")
+      this.props.history("/")
     })
   }
 

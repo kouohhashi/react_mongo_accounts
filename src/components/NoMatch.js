@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from '../utils/Helpers'
 import { connect } from 'react-redux'
 
 class NoMatch extends Component {

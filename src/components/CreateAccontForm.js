@@ -1,14 +1,10 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from '../utils/Helpers'
 import { connect } from 'react-redux'
-
-// semantic-ui
+import { useNavigate } from "react-router-dom";
 import { Container, Form, Input, Button, Grid } from 'semantic-ui-react'
-
-// API
 import * as MyAPI from '../utils/MyAPI'
 import { LOCAL_STRAGE_KEY } from '../utils/Settings'
-
 import Alert from 'react-s-alert';
 import { loginWithEmailRedux } from '../actions/UserActions'
 
@@ -46,12 +42,12 @@ class CreateAccontForm extends Component {
     })
     .then(() => {
       // redirect
-      this.props.history.push("/dashboard")
+      this.props.history('/dashboard')
     })
     .catch((err) => {
       console.log("err:", err)
 
-      Alert.error(err, {
+      Alert.error(err.message, {
         position: 'top-right',
         effect: 'slide',
         timeout: 5000

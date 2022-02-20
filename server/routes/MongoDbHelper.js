@@ -1,19 +1,33 @@
 /**
  * Created by kouohhashi on 6/12/2020.
  */
-import mongodb  from 'mongodb';
+// import mongodb  from 'mongodb';
+import { MongoClient } from 'mongodb'
+
 import { v1 as uuidv1 } from 'uuid';
 
 /*
  http://mongodb.github.io/node-mongodb-native/2.0/tutorials/crud_operations/
  */
 
+console.log("MongoClient: ", MongoClient)
+
 export default class MongoDbHelper {
 
   constructor (url, db_name) {
+
+    console.log("url: ", url)
+    console.log("db_name: ", db_name)
+    console.log("")
+
     this.url = url;
     this.db_name = db_name
-    this.mongoClient = mongodb.MongoClient;
+    // this.mongoClient = mongodb.MongoClient;
+    this.mongoClient = MongoClient
+
+    // console.log("mongoClient: ", this.mongoClient)
+    console.log("")
+
     this.db = null;
   }
 

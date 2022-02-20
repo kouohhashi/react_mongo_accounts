@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from '../utils/Helpers'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-
-// semantic-ui
 import { Container, Grid } from 'semantic-ui-react'
-
 import LoginForm from './LoginForm'
 
 class Home extends Component {

@@ -1,3 +1,4 @@
+
 ## Example of basic account system on React and MongoDB
 This is an example web application written in React to demonstrate basic account feature with MongoDB.
 You can create an account and sign in with email or tokens.  
@@ -8,7 +9,8 @@ I ported Meteor's account package because I could not find good examples to deve
 ```
 git https://github.com/kouohhashi/react_mongo_accounts.git
 cd react_mongo_accounts
-npm install
+yarn install
+yarn postinstall
 ```
 
 ## modify database name on routes/api.js  
@@ -19,13 +21,13 @@ npm install
 API server is going to start on port 4002
 You can change parameters around mongodb at ./server/routes/settings.js
 ```
-npm run start_server
+yarn start_server
 ```
 
 ### Start React  
 React is going to start on port 3000
 ```
-npm run start_react
+yarn run start_react
 ```
 
 You can check at http://localhost:3000  
@@ -33,13 +35,12 @@ You can check at http://localhost:3000
 ## Requirement  
 
 ### You need MongoDB. Here's an example of installing MongoDB on mac os X  
+install mongodb based on below.
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
 
-```
-brew tap mongodb/brew
-brew install mongodb-community
-mkdir mongodb_data  
-mongod --dbpath mongodb_data/  
-```
+### Notes
+```yarn postinstall``` fix a bug of semantic-ui
+https://github.com/Semantic-Org/Semantic-UI-React/issues/4287
 
 ## License  
 MIT. You can do whatever you want.  

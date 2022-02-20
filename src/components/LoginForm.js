@@ -1,17 +1,10 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router'
+import { withRouter } from '../utils/Helpers'
 import { connect } from 'react-redux'
-
-// semantic-ui
 import { Container, Form, Input, Button, Grid } from 'semantic-ui-react'
-
-// alert
 import Alert from 'react-s-alert';
-
-// API
 import * as MyAPI from '../utils/MyAPI'
 import { LOCAL_STRAGE_KEY } from '../utils/Settings'
-
 import { loginWithEmailRedux } from '../actions/UserActions'
 
 class LoginForm extends Component {
@@ -57,7 +50,7 @@ class LoginForm extends Component {
     })
     .then(() => {
       // redirect
-      this.props.history.push("/dashboard")
+      this.props.history("/dashboard")
     })
     .catch((err) => {
       console.log("err:", err)

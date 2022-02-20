@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import '../App.css';
-
-import { Route, Switch } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Dashboard from './Dashboard'
 import Home from './Home'
 import NoMatch from './NoMatch'
 import CreateAccont from './CreateAccont'
-
-// alert
 import Alert from 'react-s-alert';
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/slide.css';
@@ -18,7 +15,8 @@ import * as MyAPI from '../utils/MyAPI'
 // redux
 import { connect } from 'react-redux'
 
-import { withRouter } from 'react-router';
+// import { withRouter } from 'react-router';
+import { withRouter } from '../utils/Helpers'
 
 import { LOCAL_STRAGE_KEY } from '../utils/Settings'
 import { loginWithEmailRedux } from '../actions/UserActions'
@@ -77,26 +75,15 @@ class App extends Component {
     return (
       <div className="App">
 
-        <Switch>
+        <Routes>
 
-          <Route exact path='/' render={() => (
-            <Home />
-          )} />
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/notfound" element={<NoMatch />}></Route>
+          <Route path="/dashboard" element={<Dashboard />}></Route>
+          <Route path="/create_acount" element={<CreateAccont />}></Route>
+          <Route element={<NoMatch />}></Route>
 
-          <Route exact path='/notfound' component={NoMatch} />
-
-          <Route exact path='/dashboard' render={() => (
-            <Dashboard />
-          )} />
-
-
-          <Route exact path='/create_acount' render={() => (
-            <CreateAccont />
-          )} />
-
-          <Route component={NoMatch} />
-
-        </Switch>
+        </Routes>
 
         <Alert stack={{limit: 3}} />
 
