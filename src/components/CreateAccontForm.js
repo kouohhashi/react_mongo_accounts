@@ -15,36 +15,37 @@ class CreateAccontForm extends Component {
     password: '',
   }
 
-  onSubmit = () => {
+  onSubmit = async () => {
 
-    const { email, password } = this.state
+    try {
 
-    const params = {
-      email: email,
-      password: password,
-    }
+      const { email, password } = this.state
 
-    // create account
-    MyAPI.createAccount(params)
-    .then((data) => {
-      // save account
+      // create account
+      let results = await MyAPI.createAccount({
+        email: email,
+        password: password,
+      })
+      if (!results) {
+        throw Error("server error")
+      }
+      if (results.status === "error") {
+        throw Error(results.message)
+      }
 
       // success
       const params = {
-        user: data.user,
-        login_token: data.login_token,
+        user: results.user,
+        login_token: results.login_token,
       }
 
       localStorage.setItem(LOCAL_STRAGE_KEY, JSON.stringify(params))
 
       this.props.mapDispatchToLoginWithPassword(params)
 
-    })
-    .then(() => {
-      // redirect
-      this.props.history('/dashboard')
-    })
-    .catch((err) => {
+      this.props.history("/dashboard")
+
+    } catch (err) {
       console.log("err:", err)
 
       Alert.error(err.message, {
@@ -52,7 +53,8 @@ class CreateAccontForm extends Component {
         effect: 'slide',
         timeout: 5000
       });
-    })
+    }
+
   }
 
   handleChange = (e, { name, value }) => {

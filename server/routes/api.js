@@ -54,6 +54,11 @@ exports.create_user = async (req, res) => {
   console.log("create_user started")
 
   try {
+
+    if (!mongoDbHelper.db) {
+      throw Error("can not access mongodb")
+    }
+
     let _rtnObj = await create_user(req, res, mongoDbHelper)
     console.log("_rtnObj: ", _rtnObj)
     res.json({
@@ -61,7 +66,9 @@ exports.create_user = async (req, res) => {
       login_token: _rtnObj.login_token,
       user_info: _rtnObj.user_info,
     });
+
   } catch(err) {
+
     console.log("err: ", err)
 
     res.json({
@@ -76,6 +83,10 @@ exports.login_with_email_password = async (req, res) => {
   console.log("login_with_email_password started")
 
   try {
+
+    if (!mongoDbHelper.db) {
+      throw Error("can not access mongodb")
+    }
 
     let {login_token, user_info} = await login_with_email_password(req, res, mongoDbHelper)
 

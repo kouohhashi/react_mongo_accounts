@@ -14,53 +14,43 @@ class LoginForm extends Component {
     password: '',
   }
 
-  onSubmit = () => {
+  onSubmit = async () => {
 
     const { email, password } = this.state
-    const params = {
-      email: email,
-      password: password,
-    }
 
-    // create account
-    MyAPI.signinWithPassword(params)
-    .then((data) => {
+    try {
 
-      return new Promise((resolve, reject) => {
-
-        if (data.status !== 'success'){
-          let error_text = 'Error';
-          if (data.detail){
-            error_text = data.detail
-          }
-          reject(error_text)
-
-        } else {
-          // success
-          const params = {
-            user: data.user,
-            login_token: data.login_token,
-          }
-
-          localStorage.setItem(LOCAL_STRAGE_KEY, JSON.stringify(params))
-          this.props.mapDispatchToLoginWithPassword(params)
-          resolve()
-        }
+      let results = await MyAPI.signinWithPassword({
+        email: email,
+        password: password,
       })
-    })
-    .then(() => {
-      // redirect
+      if (!results) {
+        throw Error("server error")
+      }
+      if (results.status === "error") {
+        throw Error(results.message)
+      }
+
+      const params = {
+        user: results.user,
+        login_token: results.login_token,
+      }
+
+      localStorage.setItem(LOCAL_STRAGE_KEY, JSON.stringify(params))
+      this.props.mapDispatchToLoginWithPassword(params)
+
       this.props.history("/dashboard")
-    })
-    .catch((err) => {
+
+    } catch (err) {
       console.log("err:", err)
 
-      Alert.error(err, {
+      Alert.error(err.message, {
         position: 'top-right',
         effect: 'slide',
         timeout: 5000
       });
-    })
+
+    }
   }
 
   handleChange = (e, { name, value }) => {
